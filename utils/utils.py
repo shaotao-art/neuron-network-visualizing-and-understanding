@@ -10,24 +10,26 @@ std = torch.tensor([0.229, 0.224, 0.225])
 demean = - mean
 destd = 1/std
 
-def preprocess(img):
+def preprocess(img, div_std=False):
     """
     convert img to tensor and normalize it using imagenet's mean and std
     """
     transform = T.Compose([
         T.ToTensor(),
-        T.Normalize(mean=mean,std=std),
+        T.Normalize(mean=mean, std=[1, 1, 1] if div_std==False else std),
     ])
     return transform(img)
 
-def deprocess(tensor):
+def deprocess(tensor, div_std=False):
     """
     denormalize the input tensor and convert tensor to PIL image
     """
     transform = T.Compose([
-        T.Normalize(mean=[0,0,0], std=destd),
+        T.Normalize(mean=[0,0,0], std=[1,1,1] if div_std==False else destd),
         T.Normalize(mean=demean, std=[1,1,1]),
-        T.ToPILImage()
+        # in my code when use to PILImage, leading some highlight points in pic
+        # so i comment this
+        # T.ToPILImage()
     ])
     return transform(tensor)
 
